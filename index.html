@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHOPP EXPRESS | Loja Oficial</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="loading-screen">
+        <h1 class="loading-text">𝐒𝐇𝐎𝐏𝐏 <span>𝐄𝐗𝐏𝐑𝐄𝐒𝐒</span></h1>
+        <div style="width: 200px; height: 4px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden;">
+            <div id="loading-bar" style="width: 0%; height: 100%; background: var(--aliexpress-red); transition: width 0.3s ease;"></div>
+        </div>
+    </div>
+
+    <div id="success-modal">
+        <div class="success-card" data-aos="zoom-in">
+            <div class="w-20 h-20 bg-green-500 text-white rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-check text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Pedido Confirmado!</h2>
+            <p class="text-gray-600 text-sm leading-relaxed mb-8">Em breve, nossa equipe entrará em contato com você pelo WhatsApp para finalizar a compra.</p>
+            <button onclick="document.getElementById('success-modal').style.display='none'" class="btn-main btn-primary w-full">Continuar Comprando</button>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-24 right-5 z-[9999] space-y-2"></div>
+
+    <header class="bg-white text-gray-800 p-2 sticky top-0 z-[100] shadow-sm">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                 <a href="#" class="text-2xl font-bold text-black p-2 rounded-sm">𝐒𝐇𝐎𝐏𝐏<span class="text-[var(--aliexpress-red)]">𝐄𝐗𝐏𝐑𝐄𝐒𝐒</span></a>
+            </div>
+
+            <div class="flex-grow mx-4 hidden md:flex">
+                <div class="flex w-full">
+                    <input type="text" oninput="filtrarBusca(this)" placeholder="Pesquisar" class="w-full p-2 rounded-l-md border-gray-300 border text-black focus:ring-2 focus:ring-[var(--aliexpress-red)] outline-none">
+                    <button class="bg-gray-100 hover:bg-gray-200 p-2 rounded-r-md border-y border-r border-gray-300">
+                        <i class="fa-solid fa-magnifying-glass text-gray-500"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleProfile()" class="p-2"><i class="fa-regular fa-user text-2xl"></i></button>
+                <a href="#" onclick="toggleCart()" class="relative flex items-center p-2 rounded-sm">
+                    <i class="fa-solid fa-shopping-cart text-2xl md:text-3xl"></i>
+                    <span class="cart-count-badge absolute -top-1 right-0 text-white bg-red-500 rounded-full text-xs w-5 h-5 flex items-center justify-center font-bold">0</span>
+                </a>
+            </div>
+        </div>
+        <div class="mt-2 md:hidden">
+            <div class="flex w-full">
+                <input type="text" oninput="filtrarBusca(this)" placeholder="Pesquisar..." class="w-full p-2 rounded-l-md border-gray-300 border text-black outline-none">
+                 <button class="bg-gray-100 hover:bg-gray-200 p-2 rounded-r-md border-y border-r border-gray-300">
+                    <i class="fa-solid fa-magnifying-glass text-gray-500"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="bg-white text-gray-800 p-2 flex items-center space-x-4 text-sm overflow-x-auto hide-scroll border-b">
+        <button onclick="filterByCategory('Todos')" class="font-bold px-2 py-1 border border-transparent hover:border-gray-300 rounded-sm whitespace-nowrap">Todos</button>
+        <div id="categories-list" class="flex gap-1"></div>
+    </section>
+    
+    <main>
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title" data-aos="fade-down">Ofertas de Verdade.</h1>
+                <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200"></p>
+            </div>
+        </section>
+
+        <section class="benefits-section">
+            <div class="benefit" data-aos="fade-right">
+                <i class="fa-solid fa-bolt"></i>
+                <h3>Entrega Rápida</h3>
+                <p>Receba seus produtos em tempo recorde.</p>
+            </div>
+            <div class="benefit" data-aos="fade-up">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h3>Compra Segura</h3>
+                <p>Plataforma 100% segura e confiável.</p>
+            </div>
+            <div class="benefit" data-aos="fade-left">
+                <i class="fa-solid fa-headset"></i>
+                <h3>Suporte Premium</h3>
+                <p>Atendimento rápido e personalizado via WhatsApp.</p>
+            </div>
+        </section>
+        
+        <div id="promo-section" class="hidden">
+            <div class="flex items-center gap-2 p-4 pb-2">
+                <i class="fa-solid fa-fire text-[var(--promo-orange)] text-xl"></i>
+                <h2 class="font-extrabold text-lg uppercase tracking-tight">Super Ofertas</h2>
+            </div>
+            <div id="promo-grid" class="grid-container"></div>
+            <hr class="mx-4 border-gray-200">
+        </div>
+
+        <div id="product-grid" class="grid-container"></div>
+    </main>
+    
+
+    <footer class="mini-footer">
+        <div class="footer-content">
+            <div class="footer-brand">𝗦𝗛𝗢𝗣𝗣 <span>𝗘𝗫𝗣𝗥𝗘𝗦𝗦</span></div>
+            <div class="hidden lg:block text-[9px] opacity-40 font-bold">PLATAFORMA SEGURA &copy; 2026</div>
+        </div>
+    </footer>
+
+    <div id="cart-panel" class="side-panel flex flex-col">
+        <div class="flex justify-between items-center mb-8 border-b pb-4">
+            <h2 class="text-2xl font-bold">Sacola de Compras</h2>
+            <button onclick="toggleCart()" class="text-3xl opacity-70 hover:opacity-100">&times;</button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
+        <div class="mt-4 pt-4 border-t border-gray-200">
+             <label class="text-sm font-bold block mb-4 text-gray-700">Forma de Pagamento</label>
+             <div class="payment-options">
+                <label class="payment-option selected">
+                    <input type="radio" name="payment" value="Pix" checked>
+                    <i class="fa-brands fa-pix"></i>
+                    <span>Pix</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="Cartão de Crédito">
+                    <i class="fa-regular fa-credit-card"></i>
+                    <span>Cartão</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="Dinheiro">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <span>Dinheiro</span>
+                </label>
+            </div>
+        </div>
+        <div class="pt-6 border-t border-gray-200 mt-4">
+            <div class="flex justify-between font-bold text-xl mb-6"><span>Subtotal</span><span id="cart-total">R$ 0,00</span></div>
+            <button onclick="finalizarPedido()" id="btn-finalizar" class="btn-main btn-primary w-full">Finalizar Pedido</button>
+        </div>
+    </div>
+
+    <div id="details-panel" class="side-panel overflow-y-auto hide-scroll pr-4">
+        <button onclick="closeDetails()" class="text-sm font-bold text-gray-500 mb-6 uppercase hover:text-black">&larr; Voltar aos produtos</button>
+        <div id="details-body"></div>
+    </div>
+    
+    <div id="profile-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[3000] hidden flex items-center justify-center p-6" data-aos="fade-in">
+        <div class="w-full max-w-sm bg-white p-8 rounded-lg text-black" data-aos="zoom-in">
+            <div id="profile-content"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
